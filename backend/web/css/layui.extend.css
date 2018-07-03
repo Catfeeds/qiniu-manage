@@ -1,0 +1,92 @@
+.layui-side-menu{
+    display: none;
+}
+.dd-list .dd-list{
+    display: none;
+    padding-left: 30px;
+}
+a.cmd-btn{
+    color: #2F9688;
+    margin: 0 3px;
+}
+a.cmd-btn:hover{
+    cursor: pointer;
+}
+li.dd-item{
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    min-height: 20px;
+    font-size: 13px;
+    line-height: 20px;
+}
+li.dd-item div.btn-collapse-expand{
+    display: block;
+    position: relative;
+    cursor: pointer;
+    float: left;
+    width: 25px;
+    height: 20px;
+    margin: 8px 2px;
+    padding: 0;
+    border: 0;
+    background: 0 0;
+    font-size: 10px;
+    line-height: 20px;
+    text-align: center;
+    color: #2F9688;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+li.dd-item div.dd-handle{
+    cursor: default;
+    display: block;
+    margin: 5px 0;
+    padding: 7px 10px;
+    color: #333;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+li.dd-item div.dd-handle:hover{
+    cursor: pointer;
+    background-color: #2F9688;
+    color: #ffffff;
+}
+li.dd-item div.dd-handle:hover > *{
+    cursor: pointer;
+    background-color: #2F9688;
+    color: #ffffff !important;
+}
+span.btn-is-show{
+    margin: 0 3px;
+}
+span.btn-show{
+    color: #2F9688;
+}
+span.btn-hide{
+    color: #C9C9C9;
+}
+.permission-wrap{
+    clear: none;
+}
+.dd-item-permission{
+    width: 33% !important;
+    margin: 0 0.1666% !important;
+    float: left;
+}
+.clear{
+    clear:both
+}
+.necessary{
+    color: red;
+}
+.layui-footer{
+    z-index: 10000;
+}
+.attribute-item{
+    margin-bottom: 30px;
+}
