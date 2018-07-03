@@ -23,14 +23,21 @@ use common\models\AuthAccount;
     <div class="layui-form-item">
         <label class="layui-form-label">空间名称</label>
         <div class="layui-input-block">
-            <textarea name="bucket" placeholder="请输入空间名称" class="layui-textarea"></textarea>
+            <input type="text" name="bucket" lay-verify="required" placeholder="请输入空间名称" autocomplete="off" class="layui-input">
         </div>
     </div>
 
     <div class="layui-form-item">
-        <label class="layui-form-label">空间域名</label>
+        <label class="layui-form-label">空间绑定域名</label>
         <div class="layui-input-block">
-            <textarea name="domain" placeholder="请输入空间域名" class="layui-textarea"></textarea>
+            <textarea name="domains" placeholder="请输入空间绑定域名" class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">默认域名</label>
+        <div class="layui-input-block">
+            <input type="text" name="defaultDomain" lay-verify="required" placeholder="请输入默认域名" autocomplete="off" class="layui-input">
         </div>
     </div>
 

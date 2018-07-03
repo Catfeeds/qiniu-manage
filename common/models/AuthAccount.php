@@ -8,6 +8,7 @@ use common\libs\CommonFunction;
  * This is the model class for table "{{%auth_account}}".
  *
  * @property integer $id
+ * @property string $alias
  * @property string $accessKey
  * @property string $secretKey
  * @property integer $createTime
@@ -29,7 +30,8 @@ class AuthAccount extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['accessKey', 'secretKey'], 'required'],
+            [['alias', 'accessKey', 'secretKey'], 'required'],
+            [['alias', 'accessKey', 'secretKey'], 'unique'],
             [['createTime', 'updateTime'], 'integer'],
             [['accessKey', 'secretKey'], 'string', 'max' => 50],
         ];
@@ -42,6 +44,7 @@ class AuthAccount extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'alias' => '别名',
             'accessKey' => 'Access Key',
             'secretKey' => 'Secret Key',
             'createTime' => '创建时间',

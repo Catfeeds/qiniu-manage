@@ -9,18 +9,27 @@ use yii\helpers\Html;
 <form class="layui-form" lay-filter="layui-form" method="post">
 
     <div class="layui-form-item">
+        <label class="layui-form-label">别名</label>
+        <div class="layui-input-block">
+            <input type="text" name="alias" lay-verify="required" placeholder="请输入别名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <?php if(!$model->id): ?>
+    <div class="layui-form-item">
         <label class="layui-form-label">Access Key</label>
         <div class="layui-input-block">
-            <textarea name="accessKey" placeholder="请输入Access Key" class="layui-textarea"></textarea>
+            <input type="text" name="accessKey" lay-verify="required" placeholder="请输入Access Key" autocomplete="off" class="layui-input">
         </div>
     </div>
 
     <div class="layui-form-item">
         <label class="layui-form-label">Secret Key</label>
         <div class="layui-input-block">
-            <textarea name="secretKey" placeholder="请输入Secret Key" class="layui-textarea"></textarea>
+            <input type="text" name="secretKey" lay-verify="required" placeholder="请输入Secret Key" autocomplete="off" class="layui-input">
         </div>
     </div>
+    <?php endif; ?>
 
     <div class="layui-form-item layui-layout-admin">
         <div class="layui-input-block">

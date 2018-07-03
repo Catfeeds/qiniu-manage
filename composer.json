@@ -20,7 +20,7 @@
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "yiisoft/yii2-redis": "^2.0",
         "jormin/geetest": "^1.0",
-        "overtrue/flysystem-qiniu": "^1.0"
+        "jormin/qiniu": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
@@ -34,11 +34,5 @@
         "fxp-asset": {
             "enabled": false
         }
-    },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://asset-packagist.org"
-        }
-    ]
+    }
 }

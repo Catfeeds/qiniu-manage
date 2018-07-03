@@ -11,10 +11,10 @@ use yii\helpers\Url;
                 <thead>
                 <tr>
                     <th lay-data="{field:'id', width:80}">ID</th>
+                    <th lay-data="{field:'alias'}">别名</th>
                     <th lay-data="{field:'accessKey', width:400}">Access Key</th>
                     <th lay-data="{field:'secretKey', width:400}">Secret Key</th>
                     <th lay-data="{field:'createTime'}">创建时间</th>
-                    <th lay-data="{field:'updateTime'}">更新时间</th>
                     <th lay-data="{toolbar:'#tableBar', width:200}">操作</th>
                 </tr>
                 </thead>

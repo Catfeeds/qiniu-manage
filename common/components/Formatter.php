@@ -288,9 +288,10 @@ class Formatter extends \yii\i18n\Formatter
     public function asQiniuAccount($value){
         if(intval($value)){
             $authAccount = AuthAccount::findOne($value);
-            $value = $authAccount['accessKey'];
+            $value = CommonFunction::dealQiniuAccount($authAccount['accessKey']);
+            return $authAccount['alias'].'('.$value.')';
         }
-        return substr($value, 0, 8).'********'.substr($value, -8);
+        return CommonFunction::dealQiniuAccount($value);
     }
 
     /**
@@ -305,6 +306,17 @@ class Formatter extends \yii\i18n\Formatter
         }
         $bucket = Bucket::findOne($value);
         return $bucket['bucket'];
+    }
+
+    /**
+     * 域名列表
+     *
+     * @param $value
+     * @return mixed
+     */
+    public function asDomains($value){
+        $domains = json_decode($value, true);
+        return implode(' | ', $domains);
     }
 
 }

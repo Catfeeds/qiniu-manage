@@ -2,6 +2,8 @@
 
 namespace backend\controllers;
 
+use common\models\Bucket;
+use common\services\AuthAccountService;
 use Yii;
 use common\models\AuthAccount;
 use backend\controllers\ContentController;
@@ -29,7 +31,7 @@ class AuthAccountController extends ContentController
                 'where' => [],
                 'order' => 'createTime desc'
             ];
-            $columns = ['id', 'accessKey:qiniuAccount', 'secretKey:qiniuAccount', 'createTime:dateTime', 'updateTime:dateTime'];
+            $columns = ['id', 'alias', 'accessKey:qiniuAccount', 'secretKey:qiniuAccount', 'createTime:dateTime', 'updateTime:dateTime'];
             $this->baseIndex(AuthAccount::class, $columns, $options);
         }else{
             return $this->render('index');
@@ -45,7 +47,7 @@ class AuthAccountController extends ContentController
      */
     public function actionView($id)
     {
-        $columns = ['id', 'accessKey', 'secretKey', 'createTime:dateTime', 'updateTime:dateTime'];
+        $columns = ['id', 'alias', 'accessKey', 'secretKey', 'createTime:dateTime'];
         return $this->baseView($this->findModel($id), $columns);
     }
 
@@ -57,8 +59,14 @@ class AuthAccountController extends ContentController
     public function actionCreate()
     {
         $model = new AuthAccount();
-        $post = Yii::$app->request->post();
-        if ($model->load($post, '') && $model->save()) {
+        if ($this->request()->isPost) {
+            $post = Yii::$app->request->post();
+            $response = AuthAccountService::createAuthAccount($post['alias'], $post['accessKey'], $post['secretKey']);
+            if($response['status'] == 0){
+                Session::error($response['msg']);
+                return $this->baseForm($model, 'auth-account/_form', $response['msg']);
+            }
+            $model = $response['data'];
             Session::success('新建七牛授权账号成功');
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -94,6 +102,7 @@ class AuthAccountController extends ContentController
      */
     public function actionDelete($id)
     {
+        Bucket::deleteAll(['accountID'=>$id]);
         $this->findModel($id)->delete();
         Session::success('删除七牛授权账号成功');
         return $this->redirect(['index']);

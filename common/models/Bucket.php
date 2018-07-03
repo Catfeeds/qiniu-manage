@@ -10,7 +10,8 @@ use common\libs\Cache;
  * @property integer $id
  * @property integer $accountID
  * @property string $bucket
- * @property string $domain
+ * @property string $domains
+ * @property string $defaultDomain
  * @property integer $createTime
  * @property integer $updateTime
  *
@@ -32,10 +33,11 @@ class Bucket extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['accountID', 'bucket', 'domain'], 'required'],
+            [['accountID', 'bucket', 'domains', 'defaultDomain'], 'required'],
             [['accountID', 'createTime', 'updateTime'], 'integer'],
             [['bucket'], 'string', 'max' => 50],
-            [['domain'], 'string', 'max' => 100],
+            [['domains'], 'string', 'max' => 1000],
+            [['defaultDomain'], 'string', 'max' => 100],
         ];
     }
 
@@ -48,7 +50,8 @@ class Bucket extends \yii\db\ActiveRecord
             'id' => 'ID',
             'accountID' => '授权账号',
             'bucket' => '空间名称',
-            'domain' => '空间域名',
+            'domains' => '空间绑定域名',
+            'defaultDomain' => '默认域名',
             'createTime' => '创建时间',
             'updateTime' => '更新时间',
         ];

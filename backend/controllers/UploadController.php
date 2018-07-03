@@ -17,8 +17,7 @@ class UploadController extends BaseController
         $params = $this->get();
         $isImg = $params['isImg'];
         $bucket = $isImg ? $qiniuConfig['imgBucket'] : $qiniuConfig['downloadBucket'];
-        $domain = $isImg ? $qiniuConfig['imgDomain'] : $qiniuConfig['downloadDomain'];
-        $token = UploadService::getToken($bucket, $domain);
+        $token = UploadService::getToken($bucket);
         die(json_encode(['uptoken'=>$token]));
     }
 }

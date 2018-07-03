@@ -24,7 +24,7 @@ use yii\helpers\Html;
     <div class="layui-form-item">
         <label class="layui-form-label"><?=$model->attributeLabels()[$attribute]?></label>
         <div class="layui-input-block">
-            <textarea name="<?=$attribute?>" placeholder="请输入<?=$model->attributeLabels()[$attribute]?>" class="layui-textarea"></textarea>
+            <input type="text" name="<?=$attribute?>" lay-verify="required" placeholder="请输入<?=$model->attributeLabels()[$attribute]?>" autocomplete="off" class="layui-input">
         </div>
     </div>
 <?php endif; ?>

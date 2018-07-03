@@ -28,7 +28,7 @@ class BucketController extends ContentController
                 'where' => [],
                 'order' => 'createTime desc',
             ];
-            $columns = ['id', 'accountID:qiniuAccount', 'bucket', 'domain', 'createTime:dateTime', 'updateTime:dateTime'];
+            $columns = ['id', 'accountID:qiniuAccount', 'bucket', 'domains:domains', 'defaultDomain', 'createTime:dateTime'];
             $this->baseIndex(Bucket::class, $columns, $options);
         }else{
             return $this->render('index');
@@ -44,7 +44,7 @@ class BucketController extends ContentController
      */
     public function actionView($id)
     {
-        $columns = ['id', 'authAccount.accessKey:qiniuAccount', 'bucket', 'domain', 'createTime:dateTime', 'updateTime:dateTime'];
+        $columns = ['id', 'accountID:qiniuAccount', 'bucket', 'domains:domains', 'defaultDomain', 'createTime:dateTime', 'updateTime:dateTime'];
         return $this->baseView($this->findModel($id), $columns);
     }
 
