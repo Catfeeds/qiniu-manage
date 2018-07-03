@@ -7,12 +7,16 @@
 
 namespace common\gii\crud;
 
+use backend\models\Menu;
+use backend\models\Permission;
+use backend\models\PermissionCategory;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
 use yii\db\Schema;
 use yii\gii\CodeFile;
 use yii\helpers\Inflector;
+use yii\helpers\StringHelper;
 use yii\helpers\VarDumper;
 use yii\web\Controller;
 
@@ -187,7 +191,58 @@ class Generator extends \yii\gii\Generator
             }
         }
 
+        $generate = Yii::$app->request->post('generate');
+        if($generate !== null){
+            $this->generatePermissions();
+        }
         return $files;
+    }
+
+    public function generatePermissions(){
+        $controller = $this->getControllerID();
+        $transaction = \Yii::$app->db->beginTransaction();
+        $permissionCategory = new PermissionCategory();
+        $permissionCategory->name = $this->modelName;
+        if(!$permissionCategory->save()){
+            $transaction->rollBack();
+            p('生成权限分类失败,失败原因:');
+            p($permissionCategory->errors);
+            die;
+        }
+        $actions = ['index', 'create', 'update', 'view', 'destroy'];
+        foreach ($actions as $action){
+            $permissionName = '';
+            switch ($action){
+                case 'index':
+                    $permissionName = '查看'.$this->modelName.'列表';
+                    break;
+                case 'create':
+                    $permissionName = '创建'.$this->modelName;
+                    break;
+                case 'update':
+                    $permissionName = '编辑'.$this->modelName;
+                    break;
+                case 'view':
+                    $permissionName = '查看'.$this->modelName.'详情';
+                    break;
+                case 'destroy':
+                    $permissionName = '删除'.$this->modelName;
+                    break;
+            }
+            $permission = new Permission();
+            $permission->categoryID = $permissionCategory->id;
+            $permission->name = $permissionName;
+            $permission->controller = $controller;
+            $permission->action = $action;
+            $permission->description = $permissionName.'的权限';
+            if(!$permission->save()){
+                $transaction->rollBack();
+                p('生成权限失败,失败原因:');
+                p($permission->errors);
+                die;
+            }
+        }
+        $transaction->commit();
     }
 
     /**

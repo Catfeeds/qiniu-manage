@@ -8,85 +8,46 @@ use yii\helpers\StringHelper;
 
 $urlParams = $generator->generateUrlParams();
 $nameAttribute = $generator->getNameAttribute();
-
+$modelClass = $generator->modelClass;
+$controllerID = $generator->getControllerID();
+$model = new $modelClass();
+$modelName = $generator->modelName;
+$columns = array_values($modelClass::getTableSchema()->getColumnNames());
 echo "<?php\n";
 ?>
-
-use yii\helpers\Html;
-use <?= $generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\widgets\\ListView" ?>;
-<?= $generator->enablePjax ? 'use yii\widgets\Pjax;' : '' ?>
-
-/* @var $this yii\web\View */
-<?= !empty($generator->searchModelClass) ? "/* @var \$searchModel " . ltrim($generator->searchModelClass, '\\') . " */\n" : '' ?>
-/* @var $dataProvider yii\data\ActiveDataProvider */
-
-$this->title = <?= $generator->generateString($generator->modelName) ?>;
-$this->params['breadcrumbs'][] = $this->title;
+use yii\helpers\Url;
 ?>
-
-<div class="col-md-12 <?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-index">
-    <div class="block-flat">
-        <div class="header">
-            <h3>
-                <?= "<?= " ?>Html::encode($this->title) ?>
-                <?php if(!empty($generator->searchModelClass)): ?>
-                    <?= "    <?php " . ($generator->indexWidgetType === 'grid' ? "// " : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
-                <?php endif; ?>
-                <span class="pull-right">
-                    <?= "<?= " ?>Html::a(<?= $generator->generateString('新建'.$generator->modelName) ?>, ['create'], ['class' => 'btn btn-success']) ?>
-                </span>
-            </h3>
-
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header layuiadmin-card-header-auto">
+            <button class="layui-btn layuiadmin-btn-tags" layadmin-event="create" data-url="<?='<?= Url::to([\''.$controllerID.'/create\']) ?>'?>" data-title="新建<?=$modelName?>">添加</button>
         </div>
-        <div class="content">
-            <div class="table-responsive">
-                <div class="row">
-                    <div class="col-md-12">
-                        <?= $generator->enablePjax ? '<?php Pjax::begin(); ?>' : '' ?>
-                        <?php if ($generator->indexWidgetType === 'grid'): ?>
-                            <?= "<?= " ?>GridView::widget([
-                            'dataProvider' => $dataProvider,
-                            <?= !empty($generator->searchModelClass) ? "'filterModel' => \$searchModel,\n        'columns' => [\n" : "'columns' => [\n"; ?>
-                            ['class' => 'yii\grid\SerialColumn'],
-
-                            <?php
-                            $count = 0;
-                            if (($tableSchema = $generator->getTableSchema()) === false) {
-                                foreach ($generator->getColumnNames() as $name) {
-                                    if (++$count < 6) {
-                                        echo "            '" . $name . "',\n";
-                                    } else {
-                                        echo "            // '" . $name . "',\n";
-                                    }
-                                }
-                            } else {
-                                foreach ($tableSchema->columns as $column) {
-                                    $format = $generator->generateColumnFormat($column);
-                                    if (++$count < 6) {
-                                        echo "            '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
-                                    } else {
-                                        echo "            // '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
-                                    }
-                                }
-                            }
-                            ?>
-
-                            ['class' => 'doc\components\ActionColumn'],
-                            ],
-                            ]); ?>
-                        <?php else: ?>
-                            <?= "<?= " ?>ListView::widget([
-                            'dataProvider' => $dataProvider,
-                            'itemOptions' => ['class' => 'item'],
-                            'itemView' => function ($model, $key, $index, $widget) {
-                            return Html::a(Html::encode($model-><?= $nameAttribute ?>), ['view', <?= $urlParams ?>]);
-                            },
-                            ]) ?>
-                        <?php endif; ?>
-                        <?= $generator->enablePjax ? '<?php Pjax::end(); ?>' : '' ?>
-                    </div>
-                </div>
-            </div>
+        <div class="layui-card-body">
+            <table class="layui-table" lay-data="{url:'<?='<?= Url::current()?>'?>', page:true, limit:10, id:'dataTable'}" lay-filter="dataTable">
+                <thead>
+                <tr>
+<?php foreach ($columns as $column): ?>
+                    <th lay-data="{field:'<?=$column?>'}"><?=$model->attributeLabels()[$column]?></th>
+<?php endforeach; ?>
+                    <th lay-data="{toolbar:'#tableBar'}">操作</th>
+                </tr>
+                </thead>
+            </table>
+            <script type="text/html" id="tableBar">
+                <a class="cmd-btn" lay-event='view' data-url="<?='<?= Url::to([\''.$controllerID.'/view\']) ?>'?>" data-title="查看<?=$modelName?>" >[查看]</a>
+                <a class="cmd-btn" lay-event='update' data-url="<?='<?= Url::to([\''.$controllerID.'/update\']) ?>'?>" data-title="编辑<?=$modelName?>" >[编辑]</a>
+                <a class="cmd-btn" lay-event='delete' data-url="<?='<?= Url::to([\''.$controllerID.'/delete\']) ?>'?>" data-confirm="确定删除这个<?=$modelName?>吗?">[删除]</a>
+            </script>
         </div>
     </div>
 </div>
+
+<?='<?php $this->beginBlock(\'js_footer\') ?>'?>
+<script>
+    layui.config({
+        base: '/layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table']);
+</script>
+<?='<?php $this->endBlock(); ?>'?>

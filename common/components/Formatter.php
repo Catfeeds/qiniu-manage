@@ -15,6 +15,8 @@ use common\libs\CommonFunction;
 use common\models\Ad;
 use common\models\AdPosition;
 use common\models\ArticleCategory;
+use common\models\AuthAccount;
+use common\models\Bucket;
 use common\models\Product;
 use common\models\ProductCategory;
 use common\models\ProductCompany;
@@ -152,21 +154,6 @@ class Formatter extends \yii\i18n\Formatter
     }
 
     /**
-     * 文章关联产品
-     *
-     * @param $value
-     * @return string
-     */
-    public function asArticleProduct($value)
-    {
-        if(!$value){
-            return '无';
-        }
-        $product = Product::findOne($value);
-        return $product ? $product->name : '无';
-    }
-
-    /**
      * 显示图片
      *
      * @param $value
@@ -175,84 +162,6 @@ class Formatter extends \yii\i18n\Formatter
     public function asArticleImage($value)
     {
         return "<img src='".$value."' width='100' height='100' />";
-    }
-
-    /**
-     * 广告类型
-     *
-     * @param $value
-     * @return string
-     */
-    public function asAdType($value)
-    {
-        return Ad::$labelTypes[$value];
-    }
-
-    /**
-     * 广告位
-     *
-     * @param $value
-     * @return string
-     */
-    public function asAdPosition($value)
-    {
-        if(!$value){
-            return '无';
-        }
-        $adPosition = AdPosition::findOne($value);
-        return $adPosition ? $adPosition->name : '无';
-    }
-
-    /**
-     * 广告打开方式
-     *
-     * @param $value
-     * @return string
-     */
-    public function asAdOpenType($value)
-    {
-        return Ad::$labelOpenTypes[$value];
-    }
-
-    /**
-     * 保险分类
-     *
-     * @param $value
-     * @return string
-     */
-    public function asProductCategory($value)
-    {
-        if(!$value){
-            return '无';
-        }
-        $productCategory = ProductCategory::findOne($value);
-        return $productCategory ? $productCategory->name : '无';
-    }
-
-    /**
-     * 保险公司
-     *
-     * @param $value
-     * @return string
-     */
-    public function asProductCompany($value)
-    {
-        if(!$value){
-            return '无';
-        }
-        $productCompany = ProductCompany::findOne($value);
-        return $productCompany ? $productCompany->name : '无';
-    }
-
-    /**
-     * 保险公司
-     *
-     * @param $value
-     * @return string
-     */
-    public function asProductShow($value)
-    {
-        return Product::$labelIsShow[$value];
     }
 
     /**
@@ -349,43 +258,6 @@ class Formatter extends \yii\i18n\Formatter
     }
 
     /**
-     * 商品属性
-     *
-     * @param $value
-     * @return string
-     */
-    public function asProductAttributes($value)
-    {
-        $attributesArr = [];
-        foreach ($value as $role){
-            $attributesArr[] = $role['name'].' : '.$role['value'];
-        }
-        return implode('<br>', $attributesArr);
-    }
-
-    /**
-     * 认证状态
-     *
-     * @param $value
-     * @return string
-     */
-    public function asUserAuth($value)
-    {
-        return $value ? $value['realName'] : '未认证';
-    }
-
-    /**
-     * 认证状态
-     *
-     * @param $value
-     * @return string
-     */
-    public function asUserStatus($value)
-    {
-        return User::$labelStatus[$value];
-    }
-
-    /**
      * 解密手机号
      *
      * @param $value
@@ -394,50 +266,6 @@ class Formatter extends \yii\i18n\Formatter
     public function asDecryptPhone($value)
     {
         return CommonFunction::decrypt($value);
-    }
-
-    /**
-     * 公用用户信息
-     *
-     * @param $value
-     * @return string
-     */
-    public function asCommonUser($value)
-    {
-        $user = User::get($value);
-        return Html::a("[".CommonFunction::decrypt($user['phone'])."]", 'javascript:;', ['data-url'=>Url::to(['user/view', 'id'=>$value]), "class"=>"cmd-btn", "layadmin-event"=>'view']);
-    }
-
-    /**
-     * 公用商品信息
-     *
-     * @param $value
-     * @return string
-     */
-    public function asCommonProduct($value)
-    {
-        $product = Product::get($value);
-        return Html::a("[".$product['name']."]", 'javascript:;', ['data-url'=>Url::to(['product/view', 'id'=>$value]), "class"=>"cmd-btn", "layadmin-event"=>'view']);
-    }
-
-    /**
-     * 订单状态
-     *
-     * @param $value
-     * @return mixed
-     */
-    public function asOrderStatus($value){
-        return UserOrder::$labelStatus[$value];
-    }
-
-    /**
-     * 版本类型
-     *
-     * @param $value
-     * @return mixed
-     */
-    public function asVersionType($value){
-        return Version::$labelTypes[$value];
     }
 
     /**
@@ -452,13 +280,17 @@ class Formatter extends \yii\i18n\Formatter
     }
 
     /**
-     * 版本链接
+     * 管理员名称
      *
      * @param $value
      * @return mixed
      */
-    public function asVersionUrl($value){
-        return Html::a('[下载]', $value, ['target'=>'_blank', 'class'=>'cmd-btn']);
+    public function asQiniuAccount($value){
+        if(intval($value)){
+            $authAccount = AuthAccount::findOne($value);
+            $value = $authAccount['accessKey'];
+        }
+        return substr($value, 0, 8).'********'.substr($value, -8);
     }
 
     /**
@@ -467,18 +299,12 @@ class Formatter extends \yii\i18n\Formatter
      * @param $value
      * @return mixed
      */
-    public function asIdentity($value){
-        return CommonFunction::dealIdentity(CommonFunction::decrypt($value));
-    }
-
-    /**
-     * 管理员名称
-     *
-     * @param $value
-     * @return mixed
-     */
-    public function asRelationship($value){
-        return UserOrderInsured::$relationships[$value];
+    public function asQiniuBucket($value){
+        if(!$value){
+            return '通用';
+        }
+        $bucket = Bucket::findOne($value);
+        return $bucket['bucket'];
     }
 
 }

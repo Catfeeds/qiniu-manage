@@ -40,6 +40,14 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
     {
         return '<?= $generator->generateTableName($tableName) ?>';
     }
+<?php if (array_key_exists('isShow', $labels)): ?>
+
+    public function __construct(array $config = [])
+    {
+        parent::__construct($config);
+        $this->isShow = 1;
+    }
+<?php endif; ?>
 <?php if ($generator->db !== 'db'): ?>
 
     /**
@@ -70,6 +78,20 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
 <?php endforeach; ?>
         ];
     }
+<?php if (array_key_exists('isShow', $labels)): ?>
+
+    /**
+    * 校验前处理数据
+    *
+    * @return bool
+    */
+    public function beforeValidate()
+    {
+        $this->isShow === 'on' && $this->isShow = 1;
+        ($this->isShow === 'off' || is_null($this->isShow) ) && $this->isShow = 0;
+        return parent::beforeValidate();
+    }
+<?php endif; ?>
 
 <?php if (array_key_exists('createTime', $labels) || array_key_exists('updateTime', $labels)): ?>
     /**

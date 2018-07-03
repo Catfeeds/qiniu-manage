@@ -275,4 +275,38 @@ class CommonFunction
         return strlen($identity) == 15 ? substr_replace($identity,"********",4,8) : substr_replace($identity,"********",6,8);
     }
 
+    /*
+     * 处理七牛账号显示
+     */
+    public static function dealQiniuAccount($value){
+        return substr($value, 0, 8).'********'.substr($value, -8);
+    }
+
+    /**
+     * 格式化时间
+     *
+     * @param $value
+     * @return string
+     */
+    public static function dateTime($value){
+        if(!$value) return null;
+        return date('Y-m-d H:i:s', $value);
+    }
+
+    /**
+     * 格式化尺寸
+     *
+     * @param $value
+     * @return string
+     */
+    public static function formatSize($value){
+        if($value > 1024*1024*1024){
+            return number_format($value/(1024*1024*1024), 2).'GB';
+        }else if($value > 1024*1024){
+            return number_format($value/(1024*1024), 2).'MB';
+        }else{
+            return number_format($value/1024, 2).'KB';
+        }
+    }
+
 }

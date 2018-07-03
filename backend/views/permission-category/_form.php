@@ -1,8 +1,6 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\Url;
-use backend\models\Menu;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\Menu */

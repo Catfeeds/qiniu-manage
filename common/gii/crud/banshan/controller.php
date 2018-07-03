@@ -6,7 +6,6 @@
 use yii\db\ActiveRecordInterface;
 use yii\helpers\StringHelper;
 
-
 /* @var $this yii\web\View */
 /* @var $generator yii\gii\generators\crud\Generator */
 
@@ -18,12 +17,14 @@ if ($modelClass === $searchModelClass) {
 }
 
 /* @var $class ActiveRecordInterface */
+$modelName = $generator->modelName;
 $class = $generator->modelClass;
 $pks = $class::primaryKey();
 $urlParams = $generator->generateUrlParams();
 $actionParams = $generator->generateActionParams();
 $actionParamComments = $generator->generateActionParamComments();
-
+$columns = array_values($class::getTableSchema()->getColumnNames());
+$controllerID = $generator->getControllerID();
 echo "<?php\n";
 ?>
 
@@ -34,116 +35,119 @@ use <?= ltrim($generator->modelClass, '\\') ?>;
 <?php if (!empty($generator->searchModelClass)): ?>
 use <?= ltrim($generator->searchModelClass, '\\') . (isset($searchModelAlias) ? " as $searchModelAlias" : "") ?>;
 <?php else: ?>
-use yii\data\ActiveDataProvider;
 <?php endif; ?>
 use <?= ltrim($generator->baseControllerClass, '\\') ?>;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
+use common\libs\Session;
 
 /**
  * <?= $controllerClass ?> implements the CRUD actions for <?= $modelClass ?> model.
  */
 class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->baseControllerClass) . "\n" ?>
 {
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
 
     /**
-     * Lists all <?= $modelClass ?> models.
-     * @return mixed
+     * <?=$modelName?>列表.
+     *
+     * @return string
      */
     public function actionIndex()
     {
-<?php if (!empty($generator->searchModelClass)): ?>
-        $searchModel = new <?= isset($searchModelAlias) ? $searchModelAlias : $searchModelClass ?>();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        if($this->request()->isAjax){
+<?php if (in_array('createTime', $columns)): ?>
+            $options = [
+                'join' => [],
+                'view' => 'index',
+                'like' => [],
+                'where' => [],
+                'order' => 'createTime desc'
+            ];
 <?php else: ?>
-        $dataProvider = new ActiveDataProvider([
-            'query' => <?= $modelClass ?>::find(),
-        ]);
-
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-        ]);
+            $options = [
+                'join' => [],
+                'view' => 'index',
+                'like' => [],
+                'where' => [],
+                'order' => ''
+            ];
 <?php endif; ?>
+            $columns = [<?= "'".implode("', '", $columns)."'" ?>];
+            $this->baseIndex(<?= $modelClass ?>::class, $columns, $options);
+        }else{
+            return $this->render('index');
+        }
     }
 
     /**
-     * Displays a single <?= $modelClass ?> model.
-     * <?= implode("\n     * ", $actionParamComments) . "\n" ?>
-     * @return mixed
+     * <?=$modelName?>详情.
+     *
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
      */
-    public function actionView(<?= $actionParams ?>)
+    public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel(<?= $actionParams ?>),
-        ]);
+        $columns = [<?= "'".implode("', '", $columns)."'" ?>];
+        return $this->baseView($this->findModel($id), $columns);
     }
 
     /**
-     * Creates a new <?= $modelClass ?> model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * 创建<?=$modelName?>.
+     *
+     * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
         $model = new <?= $modelClass ?>();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $post = Yii::$app->request->post();
+<?php if (in_array('isShow', $columns)): ?>
+        if($post && !isset($post['isShow'])){
+            $post['isShow'] = 'off';
+        }
+<?php endif; ?>
+        if ($model->load($post, '') && $model->save()) {
+            Session::success('新建<?=$modelName?>成功');
             return $this->redirect(['view', <?= $urlParams ?>]);
         } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            return $this->baseForm($model, '<?=$controllerID?>/_form');
         }
     }
 
     /**
-     * Updates an existing <?= $modelClass ?> model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * <?= implode("\n     * ", $actionParamComments) . "\n" ?>
-     * @return mixed
+     * 编辑<?=$modelName?>.
+     *
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
      */
-    public function actionUpdate(<?= $actionParams ?>)
+    public function actionUpdate($id)
     {
-        $model = $this->findModel(<?= $actionParams ?>);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $model = $this->findModel($id);
+        $post = Yii::$app->request->post();
+<?php if (in_array('isShow', $columns)): ?>
+        if($post && !isset($post['isShow'])){
+            $post['isShow'] = 'off';
+        }
+<?php endif; ?>
+        if ($model->load($post, '') && $model->save()) {
+            Session::success('编辑<?=$modelName?>成功');
             return $this->redirect(['view', <?= $urlParams ?>]);
         } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            return $this->baseForm($model, '<?=$controllerID?>/_form');
         }
     }
 
     /**
-     * Deletes an existing <?= $modelClass ?> model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * <?= implode("\n     * ", $actionParamComments) . "\n" ?>
-     * @return mixed
+     * 删除<?=$modelName?>.
+     *
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
      */
-    public function actionDelete(<?= $actionParams ?>)
+    public function actionDelete($id)
     {
-        $this->findModel(<?= $actionParams ?>)->delete();
-
+        $this->findModel($id)->delete();
+        Session::success('删除<?=$modelName?>成功');
         return $this->redirect(['index']);
     }
 

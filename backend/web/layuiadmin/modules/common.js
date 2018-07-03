@@ -100,7 +100,7 @@ layui.define(['table', 'form'], function(exports){
         var full = obj.data('full');
         var width = obj.data('width');
         var height = obj.data('height');
-
+        var refresh = obj.data('refresh');
         if(!width){
             width = '550px';
         }
@@ -113,7 +113,9 @@ layui.define(['table', 'form'], function(exports){
             ,content: url
             ,maxmin: true
             ,area: [width, height],
-            end: layerOpenEndCallback
+            end: function () {
+                refreshTab();
+            }
         });
         if(full){
             layer.full(layerIndex);
@@ -124,10 +126,6 @@ layui.define(['table', 'form'], function(exports){
         layer.load(2);
         location.reload();
     }
-
-    var layerOpenEndCallback = function () {
-        refreshTab();
-    };
 
     exports('common', {});
 });

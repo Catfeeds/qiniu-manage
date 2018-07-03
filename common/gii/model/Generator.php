@@ -234,7 +234,6 @@ class Generator extends \yii\gii\Generator
                 );
             }
         }
-
         return $files;
     }
 
