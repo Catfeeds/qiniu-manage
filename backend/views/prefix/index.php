@@ -10,9 +10,10 @@ use yii\helpers\Url;
             <table class="layui-table" lay-data="{url:'<?= Url::current()?>', page:true, limit:10, id:'dataTable'}" lay-filter="dataTable">
                 <thead>
                 <tr>
-                    <th lay-data="{field:'id'}">ID</th>
-                    <th lay-data="{field:'bucketID'}">七牛空间</th>
+                    <th lay-data="{field:'id', width:80}">ID</th>
                     <th lay-data="{field:'prefix'}">前缀</th>
+                    <th lay-data="{field:'accountID'}">授权账号</th>
+                    <th lay-data="{field:'bucketID'}">七牛空间</th>
                     <th lay-data="{field:'createTime'}">创建时间</th>
                     <th lay-data="{field:'updateTime'}">更新时间</th>
                     <th lay-data="{toolbar:'#tableBar'}">操作</th>

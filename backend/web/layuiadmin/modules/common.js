@@ -88,6 +88,10 @@ layui.define(['table', 'form'], function(exports){
                 var url = $(this).data("url")+"?id="+data.id;
                 layerOpen($(this), url);
                 break;
+            case 'download':
+                var url = $(this).data("url");
+                window.open(url);
+                break;
         }
     });
 
@@ -114,7 +118,9 @@ layui.define(['table', 'form'], function(exports){
             ,maxmin: true
             ,area: [width, height],
             end: function () {
-                refreshTab();
+                if(refresh === undefined || refresh === 'true'){
+                    refreshTab();
+                }
             }
         });
         if(full){

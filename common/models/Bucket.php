@@ -109,7 +109,7 @@ class Bucket extends \yii\db\ActiveRecord
     public function resetCache(){
         Cache::set('BUCKET_'.$this->id, $this->attributes);
         $cache = self::find()->select('bucket')->indexBy('id')->column();
-        Cache::set('ALL_BUCKET_OPTIONS', $cache);
+        Cache::clear('ALL_BUCKET_OPTIONS');
     }
 
     /**
@@ -143,7 +143,11 @@ class Bucket extends \yii\db\ActiveRecord
         $cacheName = 'ALL_BUCKET_OPTIONS';
         $cache = Cache::get($cacheName);
         if($cache === false){
-            $cache = self::find()->select('bucket')->indexBy('id')->column();
+            $accounts = AuthAccount::find()->asArray()->all();
+            foreach ($accounts as $account){
+                $options = self::find()->where(['accountID'=>$account['id']])->select('bucket')->indexBy('id')->column();
+                $cache[$account['alias']] = $options;
+            }
             Cache::set($cacheName, $cache);
         }
         return $cache;

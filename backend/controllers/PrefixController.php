@@ -2,9 +2,10 @@
 
 namespace backend\controllers;
 
+use common\models\Bucket;
+use common\services\PrefixService;
 use Yii;
 use common\models\Prefix;
-use backend\controllers\ContentController;
 use yii\web\NotFoundHttpException;
 use common\libs\Session;
 
@@ -29,7 +30,11 @@ class PrefixController extends ContentController
                 'where' => [],
                 'order' => 'createTime desc'
             ];
-            $columns = ['id', 'bucketID:qiniuBucket', 'prefix', 'createTime:dateTime', 'updateTime:dateTime'];
+            $params = $this->post();
+            if(isset($params['bucketID'])){
+                $options['where'][] = ['in', 'bucketiD', [0, $params['bucketID']]];
+            }
+            $columns = ['id', 'accountID:qiniuAccount', 'bucketID:qiniuBucket', 'prefix', 'createTime:dateTime', 'updateTime:dateTime'];
             $this->baseIndex(Prefix::class, $columns, $options);
         }else{
             return $this->render('index');
@@ -45,7 +50,7 @@ class PrefixController extends ContentController
      */
     public function actionView($id)
     {
-        $columns = ['id', 'bucket.bucket', 'prefix', 'createTime:dateTime', 'updateTime:dateTime'];
+        $columns = ['id', 'accountID:qiniuAccount', 'bucketID:qiniuBucket', 'prefix', 'createTime:dateTime', 'updateTime:dateTime'];
         return $this->baseView($this->findModel($id), $columns);
     }
 
@@ -57,8 +62,14 @@ class PrefixController extends ContentController
     public function actionCreate()
     {
         $model = new Prefix();
-        $post = Yii::$app->request->post();
-        if ($model->load($post, '') && $model->save()) {
+        if ($this->request()->isPost) {
+            $post = Yii::$app->request->post();
+            $response = PrefixService::createPrefix($post['prefix'], $post['bucketID']);
+            if($response['status'] == 0){
+                Session::error($response['msg']);
+                return $this->baseForm($model, 'prefix/_form', $response['msg']);
+            }
+            $model = $response['data'];
             Session::success('新建前缀成功');
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -77,6 +88,14 @@ class PrefixController extends ContentController
     {
         $model = $this->findModel($id);
         $post = Yii::$app->request->post();
+        if($this->request()->isPost){
+            if($post['bucketID']){
+                $bucket = Bucket::get($post['bucketID']);
+                $post['accountID'] = $bucket['accountID'];
+            }else{
+                $post['bucketID'] = $post['accountID'] = 0;
+            }
+        }
         if ($model->load($post, '') && $model->save()) {
             Session::success('编辑前缀成功');
             return $this->redirect(['view', 'id' => $model->id]);

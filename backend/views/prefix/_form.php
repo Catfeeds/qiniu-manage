@@ -14,19 +14,31 @@ use common\models\Bucket;
         <div class="layui-input-block">
             <select name="bucketID" lay-search="" lay-filter="bucketID" lay-verify="required">
                 <option value="0">通用</option>
-                <?php foreach (Bucket::options() as $bucketID => $bucket): ?>
-                    <option value="<?= $bucketID ?>"><?= $bucket ?></option>
+                <?php foreach (Bucket::options() as $accountAlias => $options): ?>
+                    <optgroup label="<?=$accountAlias?>">
+                        <?php foreach ($options as $bucketID => $bucket): ?>
+                            <option value="<?= $bucketID ?>"><?= $bucket ?></option>
+                        <?php endforeach; ?>
+                    </optgroup>
                 <?php endforeach; ?>
             </select>
         </div>
     </div>
-
-    <div class="layui-form-item">
-        <label class="layui-form-label">前缀</label>
-        <div class="layui-input-block">
-            <textarea name="prefix" placeholder="请输入前缀" class="layui-textarea"></textarea>
+    <?php if($model->id): ?>
+        <div class="layui-form-item">
+            <label class="layui-form-label">前缀</label>
+            <div class="layui-input-block">
+                <input type="text" name="prefix" lay-verify="required" placeholder="请输入前缀" autocomplete="off" class="layui-input">
+            </div>
         </div>
-    </div>
+    <?php else: ?>
+        <div class="layui-form-item">
+            <label class="layui-form-label">前缀</label>
+            <div class="layui-input-block">
+                <textarea name="prefix" placeholder="请输入前缀" class="layui-textarea"></textarea>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <div class="layui-form-item layui-layout-admin">
         <div class="layui-input-block">

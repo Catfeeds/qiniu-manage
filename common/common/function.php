@@ -86,18 +86,3 @@
         $timestamp = rand($begin, $end);
         return date("Y-m-d", $timestamp);
     }
-
-    /**
-     * 驼峰命名转中横线命名
-     *
-     * @param $str
-     * @return string
-     */
-    function convertCamel($str)
-    {
-        $dstr = preg_replace_callback('/([A-Z]+)/',function($matchs)
-        {
-            return '-'.strtolower($matchs[0]);
-        },$str);
-        return trim(preg_replace('/_{2,}/','-',$dstr),'-');
-    }

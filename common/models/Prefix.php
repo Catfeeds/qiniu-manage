@@ -8,6 +8,7 @@ use common\libs\Cache;
  * This is the model class for table "{{%prefix}}".
  *
  * @property integer $id
+ * @property integer $accountID
  * @property integer $bucketID
  * @property string $prefix
  * @property integer $createTime
@@ -31,9 +32,10 @@ class Prefix extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['bucketID', 'prefix'], 'required'],
-            [['bucketID', 'createTime', 'updateTime'], 'integer'],
+            [['prefix'], 'required'],
+            [['accountID', 'bucketID', 'createTime', 'updateTime'], 'integer'],
             [['prefix'], 'string', 'max' => 100],
+            [['bucketID', 'prefix'], 'unique', 'targetAttribute' => ['bucketID', 'prefix'], 'message' => '空间下已有该前缀'],
         ];
     }
 
@@ -44,6 +46,7 @@ class Prefix extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'accountID' => '授权账号',
             'bucketID' => '七牛空间ID',
             'prefix' => '前缀',
             'createTime' => '创建时间',

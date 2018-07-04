@@ -1,6 +1,7 @@
 <?php
 
 namespace common\libs;
+use yii\helpers\Html;
 
 /**
  * Class CommonFunction
@@ -307,6 +308,66 @@ class CommonFunction
         }else{
             return number_format($value/1024, 2).'KB';
         }
+    }
+
+    /**
+     * 判断是否图片
+     *
+     * @param $mime
+     * @return bool
+     */
+    public static function isImage($mime){
+        $imageMimes = [
+            'image/bmp',
+            'image/cis-cod',
+            'image/gif',
+            'image/ief',
+            'image/jpeg',
+            'image/jpeg',
+            'image/jpeg',
+            'image/pipeg',
+            'image/svg+xml',
+            'image/tiff',
+            'image/tiff',
+            'image/x-cmu-raster',
+            'image/x-cmx',
+            'image/x-icon',
+            'image/x-portable-anymap',
+            'image/x-portable-bitmap',
+            'image/x-portable-graymap',
+            'image/x-portable-pixmap',
+            'image/x-rgb',
+            'image/x-xbitmap',
+            'image/x-xpixmap',
+            'image/x-xwindowdump'
+        ];
+        return in_array($mime, $imageMimes);
+    }
+
+    /**
+     * 生成链接
+     *
+     * @param $text
+     * @param $url
+     * @param $class
+     * @param $event
+     * @param string $full
+     * @param string $height
+     * @param string $refresh
+     * @return string
+     */
+    public static function createLink($text, $url, $class, $event, $full="false", $height='', $refresh="true"){
+        $options = ['class'=>$class, 'lay-event'=>$event,  'data-full'=>$full, ''=>"", 'data-refresh'=>$refresh];
+        if($event == 'download'){
+            $options['data-url'] = $url;
+            $options['target'] = '_blank';
+        }else{
+            $options['data-url'] = $url;
+        }
+        if($height){
+            $options['data-height'] = $height;
+        }
+        return Html::a($text, null, $options);
     }
 
 }

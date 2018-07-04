@@ -76,6 +76,9 @@ class BucketController extends ContentController
     {
         $model = $this->findModel($id);
         $post = Yii::$app->request->post();
+        if($this->request()->isPost){
+            $post = ['defaultDomain' => $post['defaultDomain']];
+        }
         if ($model->load($post, '') && $model->save()) {
             Session::success('编辑七牛空间成功');
             return $this->redirect(['view', 'id' => $model->id]);

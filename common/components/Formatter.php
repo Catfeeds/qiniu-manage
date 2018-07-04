@@ -286,10 +286,12 @@ class Formatter extends \yii\i18n\Formatter
      * @return mixed
      */
     public function asQiniuAccount($value){
+        if(!$value){
+            return '通用';
+        }
         if(intval($value)){
             $authAccount = AuthAccount::findOne($value);
-            $value = CommonFunction::dealQiniuAccount($authAccount['accessKey']);
-            return $authAccount['alias'].'('.$value.')';
+            return $authAccount['alias'];
         }
         return CommonFunction::dealQiniuAccount($value);
     }

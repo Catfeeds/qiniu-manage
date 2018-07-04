@@ -94,7 +94,7 @@ class AuthAccount extends \yii\db\ActiveRecord
      */
     public function resetCache(){
         Cache::set('AUTH_ACCOUNT_'.$this->id, $this->attributes);
-        $cache = self::find()->select('accessKey')->indexBy('id')->column();
+        $cache = self::find()->select('alias')->indexBy('id')->column();
         Cache::set('ALL_AUTH_ACCOUNT_OPTIONS', $cache);
     }
 
@@ -128,11 +128,8 @@ class AuthAccount extends \yii\db\ActiveRecord
         $cacheName = 'ALL_AUTH_ACCOUNT_OPTIONS';
         $cache = Cache::get($cacheName);
         if($cache === false){
-            $cache = self::find()->select('accessKey')->indexBy('id')->column();
+            $cache = self::find()->select('alias')->indexBy('id')->column();
             Cache::set($cacheName, $cache);
-        }
-        foreach ($cache as $key => $value){
-            $cache[$key] = CommonFunction::dealQiniuAccount($value);
         }
         return $cache;
     }

@@ -5,6 +5,8 @@ use common\models\AuthAccount;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Bucket */
+$domains = json_decode($model->domains);
+$model->domains = implode(' | ', $domains);
 ?>
 
 <form class="layui-form" lay-filter="layui-form" method="post">
@@ -12,9 +14,9 @@ use common\models\AuthAccount;
     <div class="layui-form-item">
         <label class="layui-form-label">授权账号</label>
         <div class="layui-input-block">
-            <select name="accountID" lay-search="" lay-filter="accountID" lay-verify="required">
-                <?php foreach (AuthAccount::options() as $accountID => $accessKey): ?>
-                    <option value="<?= $accountID ?>"><?= $accessKey ?></option>
+            <select name="accountID" lay-search="" lay-filter="accountID" lay-verify="required" disabled>
+                <?php foreach (AuthAccount::options() as $accountID => $alias): ?>
+                    <option value="<?= $accountID ?>"><?= $alias ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -23,21 +25,25 @@ use common\models\AuthAccount;
     <div class="layui-form-item">
         <label class="layui-form-label">空间名称</label>
         <div class="layui-input-block">
-            <input type="text" name="bucket" lay-verify="required" placeholder="请输入空间名称" autocomplete="off" class="layui-input">
+            <input type="text" name="bucket" lay-verify="required" placeholder="请输入空间名称" autocomplete="off" class="layui-input" disabled>
         </div>
     </div>
 
     <div class="layui-form-item">
         <label class="layui-form-label">空间绑定域名</label>
         <div class="layui-input-block">
-            <textarea name="domains" placeholder="请输入空间绑定域名" class="layui-textarea"></textarea>
+            <textarea name="domains" placeholder="请输入空间绑定域名" class="layui-textarea" disabled></textarea>
         </div>
     </div>
 
     <div class="layui-form-item">
         <label class="layui-form-label">默认域名</label>
         <div class="layui-input-block">
-            <input type="text" name="defaultDomain" lay-verify="required" placeholder="请输入默认域名" autocomplete="off" class="layui-input">
+            <select name="defaultDomain" lay-search="" lay-filter="defaultDomain" lay-verify="required">
+                <?php foreach ($domains as $domain): ?>
+                    <option value="<?= $domain ?>"><?= $domain ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
     </div>
 

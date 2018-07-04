@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use common\models\Bucket;
+use common\models\Prefix;
 use common\services\AuthAccountService;
 use Yii;
 use common\models\AuthAccount;
@@ -102,6 +103,7 @@ class AuthAccountController extends ContentController
      */
     public function actionDelete($id)
     {
+        Prefix::deleteAll(['bucket'=>$id]);
         Bucket::deleteAll(['accountID'=>$id]);
         $this->findModel($id)->delete();
         Session::success('删除七牛授权账号成功');

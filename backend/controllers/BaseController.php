@@ -49,12 +49,16 @@ class BaseController extends Controller
      * @param $data
      * @param null $msg
      * @param null $count
+     * @param null $extraData
      */
-    protected function success($data, $msg=null, $count=null){
+    protected function success($data, $msg=null, $count=null, $extraData=null){
         !$msg && $msg=UserMsg::$success;
         $response = ['code'=>0, 'data'=>$data, 'msg'=>$msg];
         if($count){
             $response['count'] = $count;
+        }
+        if(is_array($extraData) && count($extraData)){
+            $response = array_merge($response, $extraData);
         }
         $this->result($response);
     }
