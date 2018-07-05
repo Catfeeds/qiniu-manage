@@ -40,6 +40,7 @@ class AuthController extends BaseController
                 }else{
                     $this->redirect(Url::to(['error/index', 'code'=>403]))->send();
                 }
+                return false;
             }
         }
         return true;

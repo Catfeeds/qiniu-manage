@@ -2,8 +2,6 @@
 
 namespace common\models;
 
-use common\libs\Cache;
-
 /**
  * This is the model class for table "{{%prefix}}".
  *
@@ -77,54 +75,5 @@ class Prefix extends \yii\db\ActiveRecord
      */
     public function getBucket(){
         return $this->hasOne(Bucket::class, ['id'=>'bucketID']);
-    }
-
-    /**
-     * 保存后操作
-     *
-     * @param bool $insert
-     * @param array $changedAttributes
-     */
-    public function afterSave($insert, $changedAttributes)
-    {
-        $this->resetCache();
-        parent::afterSave($insert, $changedAttributes);
-    }
-
-    /**
-     * 删除后操作
-     */
-    public function afterDelete()
-    {
-        $this->resetCache();
-        parent::afterDelete();
-    }
-
-    /**
-     * 重置缓存
-     */
-    public function resetCache(){
-        Cache::set('PREFIX_'.$this->id, $this->attributes);
-    }
-
-    /**
-     * 根据ID查找
-     *
-     * @param $id
-     * @param bool $isModel
-     * @return array|null|\common\models\Bucket
-     */
-    public static function get($id, $isModel=false){
-        if($isModel){
-            return self::find()->where(['id'=>$id])->one();
-        }else{
-            $cacheName = 'PREFIX_'.$id;
-            $cache = Cache::get($cacheName);
-            if($cache === false){
-                $cache = self::find()->where(['id'=>$id])->asArray()->one();
-                Cache::set($cacheName, $cache);
-            }
-            return $cache;
-        }
     }
 }

@@ -289,10 +289,17 @@ class Formatter extends \yii\i18n\Formatter
         if(!$value){
             return '通用';
         }
-        if(intval($value)){
-            $authAccount = AuthAccount::findOne($value);
-            return $authAccount['alias'];
-        }
+        $authAccount = AuthAccount::findOne($value);
+        return $authAccount['alias'];
+    }
+
+    /**
+     * 管理员名称
+     *
+     * @param $value
+     * @return mixed
+     */
+    public function asQiniuAccountConfig($value){
         return CommonFunction::dealQiniuAccount($value);
     }
 
@@ -317,6 +324,9 @@ class Formatter extends \yii\i18n\Formatter
      * @return mixed
      */
     public function asDomains($value){
+        if(!$value){
+            return '(未设置)';
+        }
         $domains = json_decode($value, true);
         return implode(' | ', $domains);
     }

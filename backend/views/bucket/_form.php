@@ -5,8 +5,8 @@ use common\models\AuthAccount;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Bucket */
-$domains = json_decode($model->domains);
-$model->domains = implode(' | ', $domains);
+$domains = $model->domains ? json_decode($model->domains) : [];
+$domains && $model->domains = implode(' | ', $domains);
 ?>
 
 <form class="layui-form" lay-filter="layui-form" method="post">
@@ -14,7 +14,7 @@ $model->domains = implode(' | ', $domains);
     <div class="layui-form-item">
         <label class="layui-form-label">授权账号</label>
         <div class="layui-input-block">
-            <select name="accountID" lay-search="" lay-filter="accountID" lay-verify="required" disabled>
+            <select name="accountID" lay-search="" lay-filter="accountID" lay-verify="required" <?=$model->id ? 'disabled' : ''?>>
                 <?php foreach (AuthAccount::options() as $accountID => $alias): ?>
                     <option value="<?= $accountID ?>"><?= $alias ?></option>
                 <?php endforeach; ?>
@@ -25,27 +25,44 @@ $model->domains = implode(' | ', $domains);
     <div class="layui-form-item">
         <label class="layui-form-label">空间名称</label>
         <div class="layui-input-block">
-            <input type="text" name="bucket" lay-verify="required" placeholder="请输入空间名称" autocomplete="off" class="layui-input" disabled>
+            <input type="text" name="bucket" lay-verify="required" placeholder="请输入空间名称" autocomplete="off" class="layui-input"  <?=$model->id ? 'disabled' : ''?>>
         </div>
     </div>
 
-    <div class="layui-form-item">
-        <label class="layui-form-label">空间绑定域名</label>
-        <div class="layui-input-block">
-            <textarea name="domains" placeholder="请输入空间绑定域名" class="layui-textarea" disabled></textarea>
+    <?php if(!$model->id): ?>
+        <div class="layui-form-item">
+            <label class="layui-form-label">区域</label>
+            <div class="layui-input-block">
+                <select name="region" lay-search="" lay-filter="region" lay-verify="required">
+                    <option value="z0">华东</option>
+                    <option value="z1">华北</option>
+                    <option value="z2">华南</option>
+                    <option value="na0">北美</option>
+                    <option value="as0">东南亚</option>
+                </select>
+            </div>
         </div>
-    </div>
+    <?php endif; ?>
 
-    <div class="layui-form-item">
-        <label class="layui-form-label">默认域名</label>
-        <div class="layui-input-block">
-            <select name="defaultDomain" lay-search="" lay-filter="defaultDomain" lay-verify="required">
-                <?php foreach ($domains as $domain): ?>
-                    <option value="<?= $domain ?>"><?= $domain ?></option>
-                <?php endforeach; ?>
-            </select>
+    <?php if($model->id): ?>
+        <div class="layui-form-item">
+            <label class="layui-form-label">空间绑定域名</label>
+            <div class="layui-input-block">
+                <textarea name="domains" placeholder="请输入空间绑定域名" class="layui-textarea" disabled></textarea>
+            </div>
         </div>
-    </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">默认域名</label>
+            <div class="layui-input-block">
+                <select name="defaultDomain" lay-search="" lay-filter="defaultDomain" lay-verify="required">
+                    <?php foreach ($domains as $domain): ?>
+                        <option value="<?= $domain ?>"><?= $domain ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <div class="layui-form-item layui-layout-admin">
         <div class="layui-input-block">

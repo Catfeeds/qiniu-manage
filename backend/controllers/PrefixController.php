@@ -69,9 +69,8 @@ class PrefixController extends ContentController
                 Session::error($response['msg']);
                 return $this->baseForm($model, 'prefix/_form', $response['msg']);
             }
-            $model = $response['data'];
             Session::success('新建前缀成功');
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['content/close']);
         } else {
             return $this->baseForm($model, 'prefix/_form');
         }

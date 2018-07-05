@@ -12,6 +12,13 @@ a.cmd-btn{
 a.cmd-btn:hover{
     cursor: pointer;
 }
+a.btn-danger{
+    color: red;
+    margin: 0 3px;
+}
+a.btn-danger:hover{
+    cursor: pointer;
+}
 li.dd-item{
     display: block;
     position: relative;

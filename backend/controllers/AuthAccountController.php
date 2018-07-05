@@ -5,6 +5,7 @@ namespace backend\controllers;
 use common\models\Bucket;
 use common\models\Prefix;
 use common\services\AuthAccountService;
+use common\services\BucketService;
 use Yii;
 use common\models\AuthAccount;
 use backend\controllers\ContentController;
@@ -32,7 +33,7 @@ class AuthAccountController extends ContentController
                 'where' => [],
                 'order' => 'createTime desc'
             ];
-            $columns = ['id', 'alias', 'accessKey:qiniuAccount', 'secretKey:qiniuAccount', 'createTime:dateTime', 'updateTime:dateTime'];
+            $columns = ['id', 'alias', 'accessKey:qiniuAccountConfig', 'secretKey:qiniuAccountConfig', 'createTime:dateTime', 'updateTime:dateTime'];
             $this->baseIndex(AuthAccount::class, $columns, $options);
         }else{
             return $this->render('index');
@@ -107,6 +108,24 @@ class AuthAccountController extends ContentController
         Bucket::deleteAll(['accountID'=>$id]);
         $this->findModel($id)->delete();
         Session::success('删除七牛授权账号成功');
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * 同步七牛空间.
+     *
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionSyncBuckets($id)
+    {
+        $response = BucketService::syncBuckets($id);
+        if($response['status'] == 0){
+            Session::error($response['msg']);
+            return $this->redirect(['index']);
+        }
+        Session::success('同步七牛空间成功');
         return $this->redirect(['index']);
     }
 

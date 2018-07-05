@@ -108,7 +108,6 @@ class Bucket extends \yii\db\ActiveRecord
      */
     public function resetCache(){
         Cache::set('BUCKET_'.$this->id, $this->attributes);
-        $cache = self::find()->select('bucket')->indexBy('id')->column();
         Cache::clear('ALL_BUCKET_OPTIONS');
     }
 

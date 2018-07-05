@@ -16,7 +16,7 @@ use yii\helpers\Url;
                     <th lay-data="{field:'bucketID'}">七牛空间</th>
                     <th lay-data="{field:'createTime'}">创建时间</th>
                     <th lay-data="{field:'updateTime'}">更新时间</th>
-                    <th lay-data="{toolbar:'#tableBar'}">操作</th>
+                    <th lay-data="{toolbar:'#tableBar', width:180}">操作</th>
                 </tr>
                 </thead>
             </table>

@@ -14,8 +14,21 @@ class ContentController extends AuthController
      */
     public function beforeAction($action)
     {
-        parent::beforeAction($action);
+        if(!parent::beforeAction($action)){
+            return false;
+        }
         $this->layout = 'content';
         return true;
+    }
+
+    /**
+     * 关闭layer弹窗
+     *
+     * @return bool
+     */
+    public function actionClose()
+    {
+        $this->layout = 'content';
+        return $this->render('close');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\services\BucketService;
 use Yii;
 use common\models\Bucket;
 use yii\web\NotFoundHttpException;
@@ -56,8 +57,14 @@ class BucketController extends ContentController
     public function actionCreate()
     {
         $model = new Bucket();
-        $post = Yii::$app->request->post();
-        if ($model->load($post, '') && $model->save()) {
+        if ($this->request()->isPost) {
+            $post = Yii::$app->request->post();
+            $response = BucketService::createBucket($post['accountID'], $post['bucket'], $post['region']);
+            if($response['status'] == 0){
+                Session::error($response['msg']);
+                return $this->baseForm($model, 'bucket/_form', $response['msg']);
+            }
+            $model = $response['data'];
             Session::success('新建七牛空间成功');
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -96,8 +103,30 @@ class BucketController extends ContentController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $response = BucketService::deleteBucket($id);
+        if($response['status'] == 0){
+            Session::error($response['msg']);
+            return $this->redirect(['index']);
+        }
         Session::success('删除七牛空间成功');
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * 同步域名.
+     *
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionSyncDomains($id)
+    {
+        $response = BucketService::syncDomains($id);
+        if($response['status'] == 0){
+            Session::error($response['msg']);
+            return $this->redirect(['index']);
+        }
+        Session::success('同步域名成功');
         return $this->redirect(['index']);
     }
 

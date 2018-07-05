@@ -4,15 +4,21 @@ use common\models\Bucket;
 use common\models\Prefix;
 
 $options = Bucket::options();
-$selectedOption = count($options) ? (count(current($options)) ? current(array_keys(current($options))) : '') : '';
+$params = Yii::$app->request->get();
+if(isset($params['marker'])){
+    $params['marker'] = '';
+}
+if(!isset($params['bucketID'])){
+    $params['bucketID'] = count($options) ? (count(current($options)) ? current(array_keys(current($options))) : '') : '';
+}
 $prefixOptions = [];
-if($selectedOption){
-    $prefixOptions = Prefix::find()->where(['in', 'bucketID', [0, $selectedOption]])->select('prefix')->indexBy('id')->column();
+if($params['bucketID']){
+    $prefixOptions = Prefix::find()->where(['in', 'bucketID', [0, $params['bucketID']]])->select('prefix')->indexBy('id')->column();
 }
 ?>
 <div class="layui-fluid">
     <div class="layui-card">
-        <form class="layui-form layui-card-header layuiadmin-card-header-auto" id="file-filter-form">
+        <form class="layui-form layui-card-header layuiadmin-card-header-auto" id="file-filter-form" action="<?=Url::current()?>" lay-filter="layui-form">
             <div class="layui-form-item">
                 <div class="layui-inline">
                     <input type="hidden" name="marker" id="marker">
@@ -22,7 +28,7 @@ if($selectedOption){
                             <?php foreach (Bucket::options() as $accountAlias => $options): ?>
                                 <optgroup label="<?=$accountAlias?>">
                                     <?php foreach ($options as $bucketID => $bucket): ?>
-                                        <option value="<?= $bucketID ?>" <?= $selectedOption == $bucketID ? 'selected' : '' ?>><?= $bucket ?></option>
+                                        <option value="<?= $bucketID ?>"><?= $bucket ?></option>
                                     <?php endforeach; ?>
                                 </optgroup>
                             <?php endforeach; ?>
@@ -48,7 +54,7 @@ if($selectedOption){
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-list" lay-filter="form-filter" layadmin-event="file_form_search" type="button">
+                    <button class="layui-btn layuiadmin-btn-list" lay-filter="form-filter">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
                 </div>
@@ -57,6 +63,11 @@ if($selectedOption){
         <div class="layui-card-body">
             <table class="layui-table" lay-filter="dataTable" id="dataTable">
             </table>
+            <script type="text/html" id="tableBar">
+                <a class="cmd-btn" lay-event='download' data-title="下载文件" >[下载]</a>
+                <a class="cmd-btn" lay-event='update' data-url="<?= Url::to(['file/update']) ?>">[编辑]</a>
+                <a class="cmd-btn btn-danger" lay-event='delete' data-url="<?= Url::to(['file/delete']) ?>" data-confirm="确定删除这个文件吗?">[删除]</a>
+            </script>
         </div>
     </div>
 </div>
@@ -71,6 +82,7 @@ if($selectedOption){
             ,table = layui.table
             ,form = layui.form
             ,admin = layui.admin;
+        form.val("layui-form", <?= json_encode($params) ?>);
         form.on('select(bucketID)', function (data) {
             $.getJSON('<?=Url::to(['prefix/index'])?>', {bucketID:data.value}, function (response) {
                 console.log(response);
@@ -93,7 +105,7 @@ if($selectedOption){
                 {field:'fsize', width:100, title:'大小'},
                 {field:'typeLabel', width:100, title:'存储类型'},
                 {field:'putTime', width:200, title:'最后更新'},
-                {field:'btn', width:100, title:'操作'}
+                {toolbar:'#tableBar', width:260, title:'操作'}
             ]]
             ,done: function (res, curr, count) {
                 var params = $('#file-filter-form').serializeJson();
@@ -103,11 +115,13 @@ if($selectedOption){
                     html += '<span class="layui-laypage-skip"><button type="button" layadmin-event="nextPage" class="layui-laypage-btn">下一页</button></span>';
                 }
                 $(".layui-table-page").remove();
-                var pageHtml = '<div class="layui-table-page"><div id="layui-table-page2"><div class="layui-box layui-laypage layui-laypage-default" id="layui-laypage-1" style="text-align: center;"><span class="layui-laypage-skip"><button type="button" layadmin-event="nextPage" class="layui-laypage-btn">下一页</button></span><span class="layui-laypage-count"></span></div></div></div>';
-                $(".layui-table-view").append(pageHtml);
-                $('.layui-laypage').html(html);
-                $(".layui-table-page").css('text-align', 'center');
-                currentPage++;
+                if(count){
+                    var pageHtml = '<div class="layui-table-page"><div id="layui-table-page2"><div class="layui-box layui-laypage layui-laypage-default" id="layui-laypage-1" style="text-align: center;"><span class="layui-laypage-skip"><button type="button" layadmin-event="nextPage" class="layui-laypage-btn">下一页</button></span><span class="layui-laypage-count"></span></div></div></div>';
+                    $(".layui-table-view").append(pageHtml);
+                    $('.layui-laypage').html(html);
+                    $(".layui-table-page").css('text-align', 'center');
+                    currentPage++;
+                }
             }
         };
         table.init('dataTable', tableOptions);
@@ -115,15 +129,6 @@ if($selectedOption){
         admin.events.nextPage = function(){
             table.reload('dataTable', {
                 where: $('#file-filter-form').serializeJson()
-            });
-        };
-        admin.events.file_form_search = function(){
-            currentPage = 1;
-            table.reload('dataTable', {
-                where: $(this).closest('form').serializeJson(),
-                page: {
-                    curr: 1
-                }
             });
         };
     });

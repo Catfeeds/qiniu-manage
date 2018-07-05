@@ -89,8 +89,7 @@ layui.define(['table', 'form'], function(exports){
                 layerOpen($(this), url);
                 break;
             case 'download':
-                var url = $(this).data("url");
-                window.open(url);
+                window.open(data.url);
                 break;
         }
     });
